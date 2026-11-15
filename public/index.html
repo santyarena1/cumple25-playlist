@@ -97,6 +97,10 @@
   @keyframes swap { from { opacity: 0; transform: translateY(14px) scale(.98); } }
 
   .toast { position: fixed; z-index: 2; left: 50%; bottom: calc(var(--u)*2.4); transform: translate(-50%, 200%); opacity: 0; background: var(--orange); color: #241a14; padding: calc(var(--u)*1) calc(var(--u)*2); border-radius: 99px; font-weight: 600; font-size: calc(var(--u)*1.4); box-shadow: 0 20px 50px #0008; transition: transform .6s cubic-bezier(.2,1.4,.4,1), opacity .3s; white-space: nowrap; }
+  .fs-btn { position: fixed; z-index: 3; top: calc(var(--u)*1.6); right: calc(var(--u)*1.6); display: flex; align-items: center; gap: 8px; background: #ffffff14; border: 1px solid #ffffff2a; color: var(--cream); font: 600 15px var(--f-body); padding: 10px 14px; border-radius: 12px; cursor: pointer; backdrop-filter: blur(8px); transition: opacity .3s, background .2s; }
+  .fs-btn:hover { background: #ffffff26; }
+  .fs-btn svg { width: 18px; height: 18px; fill: currentColor; }
+  body.idle .fs-btn, body.is-fs .fs-btn { opacity: 0; pointer-events: none; }
   .toast.show { transform: translate(-50%, 0); opacity: 1; }
 
   @media (max-aspect-ratio: 1/1) {
@@ -164,6 +168,7 @@
     </section>
   </main>
   <div class="toast" id="toast"></div>
+  <button class="fs-btn" id="fsBtn" type="button"><svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>Pantalla completa</button>
 
 <script>
   const $ = (id) => document.getElementById(id);
@@ -250,6 +255,20 @@
     clearTimeout(idleTimer);
     idleTimer = setTimeout(() => document.body.classList.add("idle"), IDLE_MS);
   });
+
+  // Pantalla completa real (esconde barra del navegador). Doble clic también alterna.
+  function toggleFullscreen() {
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+    (isFs ? exit.call(document) : req.call(el))?.catch?.((e) => console.warn("fullscreen", e));
+  }
+  .addEventListener("click", toggleFullscreen);
+  addEventListener("dblclick", toggleFullscreen);
+  const syncFs = () => document.body.classList.toggle("is-fs", Boolean(document.fullscreenElement || document.webkitFullscreenElement));
+  document.addEventListener("fullscreenchange", syncFs);
+  document.addEventListener("webkitfullscreenchange", syncFs);
 
   poll();
   setInterval(tick, 500);
