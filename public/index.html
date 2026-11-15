@@ -96,12 +96,19 @@
   .swap { animation: swap .7s cubic-bezier(.2,.8,.2,1) both; }
   @keyframes swap { from { opacity: 0; transform: translateY(14px) scale(.98); } }
 
-  .toast { position: fixed; z-index: 2; left: 50%; bottom: calc(var(--u)*2.4); transform: translate(-50%, 200%); opacity: 0; background: var(--orange); color: #241a14; padding: calc(var(--u)*1) calc(var(--u)*2); border-radius: 99px; font-weight: 600; font-size: calc(var(--u)*1.4); box-shadow: 0 20px 50px #0008; transition: transform .6s cubic-bezier(.2,1.4,.4,1), opacity .3s; white-space: nowrap; }
+  .notif { position: fixed; z-index: 2; top: calc(var(--u)*2); left: 50%; display: flex; align-items: center; gap: calc(var(--u)*1.2); min-width: calc(var(--u)*30); max-width: calc(var(--u)*46); padding: calc(var(--u)*1) calc(var(--u)*1.8) calc(var(--u)*1) calc(var(--u)*1); background: color-mix(in srgb, var(--card) 92%, transparent); border: 1px solid #ea815088; border-radius: calc(var(--u)*1.6); box-shadow: 0 24px 60px #000a, 0 0 0 calc(var(--u)*.4) #ea815022; backdrop-filter: blur(14px); transform: translate(-50%, -160%); opacity: 0; transition: transform .7s cubic-bezier(.2,1.3,.4,1), opacity .4s; }
+  .notif.show { transform: translate(-50%, 0); opacity: 1; }
+  .notif img { flex: none; width: calc(var(--u)*5.2); height: calc(var(--u)*5.2); border-radius: calc(var(--u)*.8); object-fit: cover; background: #1c2235; }
+  .notif div { min-width: 0; }
+  .notif .who { font-size: calc(var(--u)*1.25); color: var(--orange-2); margin: 0; }
+  .notif .who b { font-weight: 600; color: var(--orange); }
+  .notif .song { font-family: var(--f-display); font-size: calc(var(--u)*2.4); line-height: 1; margin: calc(var(--u)*.3) 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .notif .by { font-size: calc(var(--u)*1.1); color: var(--muted); margin: calc(var(--u)*.2) 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item .by { color: var(--orange-2); font-style: normal; }
   .fs-btn { position: fixed; z-index: 3; top: calc(var(--u)*1.6); right: calc(var(--u)*1.6); display: flex; align-items: center; gap: 8px; background: #ffffff14; border: 1px solid #ffffff2a; color: var(--cream); font: 600 15px var(--f-body); padding: 10px 14px; border-radius: 12px; cursor: pointer; backdrop-filter: blur(8px); transition: opacity .3s, background .2s; }
   .fs-btn:hover { background: #ffffff26; }
   .fs-btn svg { width: 18px; height: 18px; fill: currentColor; }
   body.idle .fs-btn, body.is-fs .fs-btn { opacity: 0; pointer-events: none; }
-  .toast.show { transform: translate(-50%, 0); opacity: 1; }
 
   @media (max-aspect-ratio: 1/1) {
     body { overflow: auto; }
@@ -163,11 +170,11 @@
       </div>
       <div class="lists">
         <div><h3>DESPUÉS VIENE</h3><div id="next"></div></div>
-        <div><h3>RECIÉN SUMADAS</h3><div id="recent"></div></div>
+        <div><h3>ÚLTIMAS AGREGADAS</h3><div id="recent"></div></div>
       </div>
     </section>
   </main>
-  <div class="toast" id="toast"></div>
+  <div class="notif" id="notif" role="status" aria-live="polite"><img id="nImg" alt="" /><div><p class="who"><b id="nWho"></b> agregó</p><p class="song" id="nSong"></p><p class="by" id="nArtist"></p></div></div>
   <button class="fs-btn" id="fsBtn" type="button"><svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>Pantalla completa</button>
 
 <script>
@@ -188,14 +195,35 @@
 
   const fmt = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const itemHtml = (t) => `<div class="item">${t.image ? `<img src="${esc(t.image)}" alt="">` : '<span class="ph"></span>'}<div><b>${esc(t.title)}</b><span>${esc(t.artist)}</span></div></div>`;
+  const itemHtml = (t) => `<div class="item">${t.image ? `<img src="${esc(t.image)}" alt="">` : '<span class="ph"></span>'}<div><b>${esc(t.title)}</b><span>${t.addedBy ? `<em class="by">${esc(t.addedBy)}</em> · ` : ""}${esc(t.artist)}</span></div></div>`;
 
   let state = { id: null, progress: 0, duration: 0, playing: false, at: Date.now() };
-  let lastTotal = null, lastListKey = "";
+  let lastListKey = "", seenAdds = null;
+  const NOTIF_MS = 7000;
+  const notifQueue = [];
 
-  function toast(msg) {
-    const t = $("toast"); t.textContent = msg; t.classList.add("show");
-    clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 6000);
+  // Notificaciones de canciones nuevas, de a una por vez.
+  function showNextNotif() {
+    if (showNextNotif.busy || !notifQueue.length) return;
+    showNextNotif.busy = true;
+    const t = notifQueue.shift();
+    $("nImg").src = t.image || "/flyer.jpg";
+    $("nWho").textContent = t.addedBy || "Alguien";
+    $("nSong").textContent = t.title;
+    $("nArtist").textContent = t.artist;
+    $("notif").classList.add("show");
+    setTimeout(() => {
+      $("notif").classList.remove("show");
+      setTimeout(() => { showNextNotif.busy = false; showNextNotif(); }, 800);
+    }, NOTIF_MS);
+  }
+
+  function checkNewAdds(recent) {
+    const key = (t) => `${t.id}|${t.addedAt}`;
+    if (seenAdds === null) { seenAdds = new Set(recent.map(key)); return; }
+    const fresh = recent.filter((t) => !seenAdds.has(key(t))).reverse();
+    fresh.forEach((t) => { seenAdds.add(key(t)); notifQueue.push(t); });
+    showNextNotif();
   }
 
   function render(d) {
@@ -226,8 +254,7 @@
 
     if (typeof d.total === "number") {
       $("count").innerHTML = `<b>${d.total}</b> ${d.total === 1 ? "tema" : "temas"} en la lista`;
-      if (lastTotal !== null && d.total > lastTotal && d.recent?.[0]) toast(`🎶 Se sumó «${d.recent[0].title}» de ${d.recent[0].artist}`);
-      lastTotal = d.total;
+      if (d.recent) checkNewAdds(d.recent);
     }
   }
 
