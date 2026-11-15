@@ -264,7 +264,7 @@
     const isFs = document.fullscreenElement || document.webkitFullscreenElement;
     (isFs ? exit.call(document) : req.call(el))?.catch?.((e) => console.warn("fullscreen", e));
   }
-  .addEventListener("click", toggleFullscreen);
+  $("fsBtn").addEventListener("click", toggleFullscreen);
   addEventListener("dblclick", toggleFullscreen);
   const syncFs = () => document.body.classList.toggle("is-fs", Boolean(document.fullscreenElement || document.webkitFullscreenElement));
   document.addEventListener("fullscreenchange", syncFs);
