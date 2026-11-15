@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/sumar", "destination": "/api/sumar" }]
+}
