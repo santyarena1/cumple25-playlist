@@ -7,11 +7,11 @@ let recentCache = { at: 0, items: [], total: 0 };
 // Últimas canciones que sumaron a la playlist (para mostrar quién viene agregando).
 async function recentAdds() {
   if (Date.now() - recentCache.at < RECENT_TTL) return recentCache;
-  const first = await api(`/playlists/${PLAYLIST_ID}/tracks?limit=1&fields=total`);
+  const first = await api(`/playlists/${PLAYLIST_ID}/items?limit=1`);
   const total = first?.total || 0;
   const offset = Math.max(0, total - 4);
-  const page = await api(`/playlists/${PLAYLIST_ID}/tracks?limit=4&offset=${offset}`);
-  const items = (page?.items || []).map((i) => track(i.track)).filter(Boolean).reverse();
+  const page = await api(`/playlists/${PLAYLIST_ID}/items?limit=4&offset=${offset}`);
+  const items = (page?.items || []).map((i) => track(i.item || i.track)).filter(Boolean).reverse();
   recentCache = { at: Date.now(), items, total };
   return recentCache;
 }

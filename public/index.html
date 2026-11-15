@@ -14,7 +14,7 @@
     --cream: #f4ead8; --cream-dim: #c9c1b3; --muted: #98a2bb;
     --orange: #ea8150; --orange-2: #f39a6c; --slate: #4c5b80;
     --f-display: "Bebas Neue", sans-serif; --f-script: "Pacifico", cursive; --f-body: "Outfit", system-ui, sans-serif;
-    --u: min(1vw, 1.78vh); /* unidad que escala con pantallas 16:9 */
+    --u: min(1vw, 1.62vh); /* unidad que escala con pantallas 16:9 */
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
@@ -41,16 +41,17 @@
   .left { display: flex; flex-direction: column; align-items: flex-start; }
   .brand { font-family: var(--f-display); font-size: calc(var(--u)*3); letter-spacing: .06em; line-height: 1; color: var(--cream-dim); margin: 0 0 calc(var(--u)*1.2); }
   .brand b { color: var(--orange); font-weight: 400; }
-  h1 { font-family: var(--f-display); font-weight: 400; font-size: calc(var(--u)*8.4); line-height: .88; margin: 0; letter-spacing: .01em; }
+  h1 { font-family: var(--f-display); font-weight: 400; font-size: calc(var(--u)*7.6); line-height: .9; margin: 0; letter-spacing: .01em; }
   h1 .accent { color: var(--orange); }
   .script { font-family: var(--f-script); font-size: calc(var(--u)*2.5); color: var(--cream); margin: calc(var(--u)*.6) 0 calc(var(--u)*2.6); }
   .qr-row { display: flex; align-items: center; gap: calc(var(--u)*3); }
   .qr { position: relative; background: var(--cream); padding: calc(var(--u)*1.8); border-radius: calc(var(--u)*2.2); transform: rotate(-2deg); box-shadow: 0 30px 80px #0008, 0 0 0 calc(var(--u)*.5) #ea815055; animation: qrPulse 4s ease-in-out infinite; }
-  .qr img { display: block; width: calc(var(--u)*22); height: calc(var(--u)*22); }
+  .qr img { display: block; width: calc(var(--u)*21); height: calc(var(--u)*21); }
   .qr .tag { position: absolute; top: calc(var(--u)*-1.6); right: calc(var(--u)*-2); background: var(--orange); color: #241a14; font-family: var(--f-display); font-size: calc(var(--u)*1.7); letter-spacing: .08em; padding: calc(var(--u)*.5) calc(var(--u)*1.1); border-radius: calc(var(--u)*.9); transform: rotate(6deg); }
   @keyframes qrPulse { 50% { box-shadow: 0 30px 80px #0008, 0 0 0 calc(var(--u)*1.1) #ea815033; } }
   .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(var(--u)*1.3); }
-  .steps li { display: flex; align-items: center; gap: calc(var(--u)*1); font-size: calc(var(--u)*1.55); color: var(--cream-dim); }
+  .steps li { display: flex; align-items: center; gap: calc(var(--u)*1); font-size: calc(var(--u)*1.55); color: var(--cream-dim); white-space: nowrap; }
+  .steps b { color: var(--orange-2); }
   .steps .n { flex: none; width: calc(var(--u)*2.6); height: calc(var(--u)*2.6); border-radius: 50%; display: grid; place-items: center; background: #ffffff12; border: 1px solid #ffffff22; font-family: var(--f-display); font-size: calc(var(--u)*1.5); color: var(--orange-2); }
   .count { margin-top: calc(var(--u)*2.4); font-size: calc(var(--u)*1.4); color: var(--muted); }
   .count b { font-family: var(--f-display); font-weight: 400; font-size: calc(var(--u)*2.2); color: var(--cream); letter-spacing: .04em; }
@@ -118,7 +119,7 @@
   <main class="stage">
     <section class="left">
       <p class="brand">CUMPLIMOS <b>25</b> · SANTY &amp; ALE</p>
-      <h1>PONÉ<br>TU <span class="accent">TEMA</span></h1>
+      <h1>PONÉ TU <span class="accent">TEMA</span></h1>
       <p class="script">la música la elegimos entre todos</p>
       <div class="qr-row">
         <div class="qr">
@@ -128,7 +129,7 @@
         <ol class="steps">
           <li><span class="n">1</span>Abrí la cámara y escaneá</li>
           <li><span class="n">2</span>Se abre la playlist en Spotify</li>
-          <li><span class="n">3</span>Tocá <b>&nbsp;+&nbsp;</b> y sumá tu canción</li>
+          <li><span class="n">3</span><span>Tocá <b>+</b> y sumá tu canción</span></li>
           <li><span class="n">4</span>Esperá a que suene acá 👉</li>
         </ol>
       </div>
