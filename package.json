@@ -1,0 +1,13 @@
+{
+  "name": "cumple25-playlist",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "qrcode": "^1.5.4"
+  },
+  "private": true
+}
