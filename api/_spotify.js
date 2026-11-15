@@ -34,7 +34,12 @@ async function accessToken() {
 async function api(path) {
   const r = await fetch(API + path, { headers: { Authorization: `Bearer ${await accessToken()}` } });
   if (r.status === 204) return null;
-  if (!r.ok) throw new Error(`Spotify ${path} ${r.status}`);
+  if (!r.ok) {
+    const err = new Error(`Spotify ${path} ${r.status}`);
+    err.status = r.status;
+    err.retryAfter = Number(r.headers.get("retry-after")) || 0;
+    throw err;
+  }
   return r.json();
 }
 

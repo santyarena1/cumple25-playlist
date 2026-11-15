@@ -174,7 +174,7 @@
       </div>
     </section>
   </main>
-  <div class="notif" id="notif" role="status" aria-live="polite"><img id="nImg" alt="" /><div><p class="who"><b id="nWho"></b> agregó</p><p class="song" id="nSong"></p><p class="by" id="nArtist"></p></div></div>
+  <div class="notif" id="notif" role="status" aria-live="polite"><img id="nImg" alt="" /><div><p class="who" id="nWho"></p><p class="song" id="nSong"></p><p class="by" id="nArtist"></p></div></div>
   <button class="fs-btn" id="fsBtn" type="button"><svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>Pantalla completa</button>
 
 <script>
@@ -208,7 +208,7 @@
     showNextNotif.busy = true;
     const t = notifQueue.shift();
     $("nImg").src = t.image || "/flyer.jpg";
-    $("nWho").textContent = t.addedBy || "Alguien";
+    $("nWho").innerHTML = t.addedBy ? `<b>${esc(t.addedBy)}</b> agregó` : "🎶 Se sumó a la lista";
     $("nSong").textContent = t.title;
     $("nArtist").textContent = t.artist;
     $("notif").classList.add("show");
@@ -219,7 +219,7 @@
   }
 
   function checkNewAdds(recent) {
-    const key = (t) => `${t.id}|${t.addedAt}`;
+    const key = (t) => t.uid || t.id;
     if (seenAdds === null) { seenAdds = new Set(recent.map(key)); return; }
     const fresh = recent.filter((t) => !seenAdds.has(key(t))).reverse();
     fresh.forEach((t) => { seenAdds.add(key(t)); notifQueue.push(t); });
