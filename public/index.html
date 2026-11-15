@@ -95,8 +95,8 @@
   .swap { animation: swap .7s cubic-bezier(.2,.8,.2,1) both; }
   @keyframes swap { from { opacity: 0; transform: translateY(14px) scale(.98); } }
 
-  .toast { position: fixed; z-index: 2; left: 50%; bottom: calc(var(--u)*2.4); transform: translate(-50%, 200%); background: var(--orange); color: #241a14; padding: calc(var(--u)*1) calc(var(--u)*2); border-radius: 99px; font-weight: 600; font-size: calc(var(--u)*1.4); box-shadow: 0 20px 50px #0008; transition: transform .6s cubic-bezier(.2,1.4,.4,1); white-space: nowrap; }
-  .toast.show { transform: translate(-50%, 0); }
+  .toast { position: fixed; z-index: 2; left: 50%; bottom: calc(var(--u)*2.4); transform: translate(-50%, 200%); opacity: 0; background: var(--orange); color: #241a14; padding: calc(var(--u)*1) calc(var(--u)*2); border-radius: 99px; font-weight: 600; font-size: calc(var(--u)*1.4); box-shadow: 0 20px 50px #0008; transition: transform .6s cubic-bezier(.2,1.4,.4,1), opacity .3s; white-space: nowrap; }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
 
   @media (max-aspect-ratio: 1/1) {
     body { overflow: auto; cursor: auto; }
